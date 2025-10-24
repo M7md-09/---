@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الكيمياء</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .timer {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .intro-screen, .quiz-screen, .results-screen {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        
+        .question {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .option {
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .option.selected {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        
+        .correct {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f5c6cb !important;
+        }
+        
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #1a252f;
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .progress {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .results-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+        
+        .results-item.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .results-item.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .user-answer {
+            margin-top: 5px;
+        }
+        
+        .correct-answer {
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* تحسينات للجوال */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .intro-screen, .quiz-screen, .results-screen {
+                padding: 15px;
+            }
+            
+            .question {
+                font-size: 1rem;
+            }
+            
+            .option {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .timer {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            header {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.2rem;
+            }
+            
+            .intro-screen, .quiz-screen, .results-screen {
+                padding: 12px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>اختبار الكيمياء النهائي</h1>
+            <p>اختبار وحدة مقدمة في علم الكيمياء</p>
+            <div class="timer" id="timer">الوقت المتبقي: 60:00</div>
+        </header>
+        
+        <div class="intro-screen" id="introScreen">
+            <h2>مرحباً بك في اختبار الكيمياء</h2>
+            <p>يتكون هذا الاختبار من 50 سؤالاً في مجال الكيمياء.</p>
+            <p>مدة الاختبار: 60 دقيقة</p>
+            <p>ملاحظة: بعد اختيار إجابة لا يمكنك تغييرها</p>
+            <button id="startBtn">بدء الاختبار</button>
+        </div>
+        
+        <div class="quiz-screen" id="quizScreen" style="display: none;">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="controls">
+                <button id="prevBtn" disabled>السابق</button>
+                <button id="nextBtn">التالي</button>
+            </div>
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="results-screen" id="resultsScreen" style="display: none;">
+            <h2>نتيجة الاختبار</h2>
+            <div class="score" id="score"></div>
+            <div id="resultsList"></div>
+            <button id="restartBtn">إعادة الاختبار</button>
+        </div>
+    </div>
+
+    <script>
+        // بيانات الأسئلة
+        const questions = [
+            {
+                question: "يهتم علم الكيمياء بدراسة:",
+                options: ["المادة", "الحرارة", "الضوء"],
+                correct: 0
+            },
+            {
+                question: "من الأمثلة على المواد الكيميائية النقية:",
+                options: ["ماء البحر", "الهيدروجين", "الخشب"],
+                correct: 1
+            },
+            {
+                question: "المادة الكيميائية لها تركيب:",
+                options: ["متغير", "ثابت", "غير منتظم"],
+                correct: 1
+            },
+            {
+                question: "يوجد غاز الأوزون في طبقة:",
+                options: ["الترويوسفير", "الستراتوسفير", "الميزوسفير"],
+                correct: 1
+            },
+            {
+                question: "المعدل الطبيعي لغاز الأوزون هو:",
+                options: ["100 DU", "200 DU", "300 DU"],
+                correct: 2
+            },
+            {
+                question: "يستخدم لقياس طبقة الأوزون:",
+                options: ["الأقمار الصناعية", "المطباف", "الطائرات"],
+                correct: 0
+            },
+            {
+                question: "مادة تعمل على تقليل سمك طبقة الأوزون:",
+                options: ["الأمونيا", "ثاني أكسيد الكربون", "مركبات الكلوروفلوروكربون"],
+                correct: 2
+            },
+            {
+                question: "المادة المستخدمة قديمًا في التبريد هي:",
+                options: ["الأمونيا", "النشا", "الملح"],
+                correct: 0
+            },
+            {
+                question: "مكتشف مركبات الكلوروفلوروكربون هو:",
+                options: ["توماس ميجلي", "والير وايت", "جراهام"],
+                correct: 0
+            },
+            {
+                question: "تستخدم مركبات الكلوروفلوروكربون في:",
+                options: ["صناعة الثلاجات", "صناعة المنظفات", "صناعة الأصباغ"],
+                correct: 0
+            },
+            {
+                question: "الميثاق الذي ينظم استخدام مركبات الكلوروفلوروكربون هو:",
+                options: ["ميثاق مونتريال", "ميثاق فيينا", "ميثاق باريس"],
+                correct: 0
+            },
+            {
+                question: "ينكون ثقب الأوزون فوق القارة القطبية الجنوبية بسبب:",
+                options: ["الكلور والفلور", "الكلور واليود", "الكلور والبروم"],
+                correct: 0
+            },
+            {
+                question: "مقياس كمية المادة هو:",
+                options: ["الكتلة", "الكثافة", "الحجم"],
+                correct: 0
+            },
+            {
+                question: "مقياس كمية المادة الذي يتأثر بالجاذبية هو:",
+                options: ["الكتلة", "الوزن", "الكثافة"],
+                correct: 1
+            },
+            {
+                question: "كلما ارتفعنا عن سطح الأرض فإن الوزن:",
+                options: ["يقل", "يزداد", "ينقى ثابتًا"],
+                correct: 0
+            },
+            {
+                question: "العالم جوليان هيل اكتشف:",
+                options: ["الدايلون", "النايلون", "البلاستيك"],
+                correct: 1
+            },
+            {
+                question: "فرع الكيمياء الذي يدرس سرعة التفاعلات هو:",
+                options: ["الكيمياء الحرارية", "الكيمياء الفيزيائية", "الكيمياء العضوية"],
+                correct: 1
+            },
+            {
+                question: "الفرع الذي يهتم بتحديد مكونات المادة هو:",
+                options: ["الكيمياء التحليلية", "الكيمياء الحيوية", "الكيمياء البيئية"],
+                correct: 0
+            },
+            {
+                question: "دراسة الإلكترونات والروابط تحت مجال:",
+                options: ["الكيمياء الفيزيائية", "الكيمياء الذرية", "الكيمياء الحرارية"],
+                correct: 1
+            },
+            {
+                question: "الفرع الذي يهتم بتركيب المادة هو:",
+                options: ["الكيمياء الذرية", "الكيمياء البيئية", "الكيمياء التحليلية"],
+                correct: 0
+            },
+            {
+                question: "الطريقة العلمية هي:",
+                options: ["أسلوب منظم لحل المشكلات", "قانون ثابت", "نظرية علمية"],
+                correct: 0
+            },
+            {
+                question: "الفرضية يُعرّف بأنه:",
+                options: ["تفسير مؤقت لظاهرة", "قانون علمي", "حقيقة مثبتة"],
+                correct: 0
+            },
+            {
+                question: "القانون العلمي يصف:",
+                options: ["ما يحدث دون تفسير", "سبب الظاهرة", "نتائج التجربة"],
+                correct: 0
+            },
+            {
+                question: "النظرية العلمية تفسر:",
+                options: ["سبب حدوث الظواهر", "النتائج فقط", "الملاحظات"],
+                correct: 0
+            },
+            {
+                question: "البيانات الكمية يُعتبر عن:",
+                options: ["الأرقام", "الظواهر الرياضية", "الألوان"],
+                correct: 0
+            },
+            {
+                question: "البيانات النوعية تصف:",
+                options: ["الشكل واللون", "الألوان فقط", "الكميات"],
+                correct: 0
+            },
+            {
+                question: "من أدوات السلامة في المختبر:",
+                options: ["النظارات الواقية", "القفازات", "كلاهما"],
+                correct: 2
+            },
+            {
+                question: "من فوائد الكيمياء:",
+                options: ["تصنيع الأدوية", "الزراعة فقط", "دراسة الكواكب"],
+                correct: 0
+            },
+            {
+                question: "العلاقة بين الكيمياء والطب يتمثل في:",
+                options: ["تطوير الأدوية", "الجراحة", "التشخيص"],
+                correct: 0
+            },
+            {
+                question: "الكتلة تُقاس بوحدة:",
+                options: ["كيلوجرام", "نيوتن", "جول"],
+                correct: 0
+            },
+            {
+                question: "الوزن يُقاس بوحدة:",
+                options: ["كيلوجرام", "نيوتن", "لتر"],
+                correct: 1
+            },
+            {
+                question: "من مجالات الكيمياء:",
+                options: ["الصناعة والزراعة والطب", "الأدب والفن", "الرياضة"],
+                correct: 0
+            },
+            {
+                question: "الهدف من البحث التطبيقي هو:",
+                options: ["حل مشكلة محددة", "اكتشاف ظواهر جديدة", "تأليف كتب علمية"],
+                correct: 0
+            },
+            {
+                question: "قانون حفظ الكتلة ينص على أن:",
+                options: ["الكتلة لا تفنى ولا تُستحدث", "الكتلة تتغير", "الطاقة لا تُفنى"],
+                correct: 0
+            },
+            {
+                question: "من الأجهزة التي يستخدمها الكيميائي:",
+                options: ["مقياس الطيف", "الميكروفون", "العدسة المحدبة"],
+                correct: 0
+            },
+            {
+                question: "من صفات الكيميائي الناجح:",
+                options: ["الملاحظة الدقيقة", "التسرع", "الإهمال"],
+                correct: 0
+            },
+            {
+                question: "طبقة الأوزون تحمي الأرض من:",
+                options: ["الأشعة فوق البنفسجية", "الأشعة تحت الحمراء", "الضوء المرئي"],
+                correct: 0
+            },
+            {
+                question: "تقل كمية الأوزون عند:",
+                options: ["القطب الجنوبي", "خط الاستواء", "الصحراء الكبرى"],
+                correct: 0
+            },
+            {
+                question: "العلم الذي يفسر تركيب المادة وتغيرها هو:",
+                options: ["الكيمياء", "الفيزياء", "الجيولوجيا"],
+                correct: 0
+            },
+            {
+                question: "الطريقة العلمية تبدأ بـ:",
+                options: ["الملاحظة", "النتائج", "النظرية"],
+                correct: 0
+            },
+            {
+                question: "من أهم أهداف الكيمياء:",
+                options: ["فهم المادة وتفاعلاتها", "دراسة النجوم", "تعلم اللغات"],
+                correct: 0
+            },
+            {
+                question: "يعد الأوزون:",
+                options: ["غازًا مفيدًا في الغلاف الجوي", "مادة صلبة", "غازًا سامًا دائمًا"],
+                correct: 0
+            },
+            {
+                question: "يسهم علم الكيمياء في حماية البيئة عبر:",
+                options: ["تطوير مواد صديقة للبيئة", "زيادة الملوثات", "تجاهل النفايات"],
+                correct: 0
+            },
+            {
+                question: "فهم الكيمياء يساعد الإنسان على:",
+                options: ["تفسير الظواهر الطبيعية", "تجاهل العلوم الأخرى", "الاعتماد على الصدفة"],
+                correct: 0
+            }
+        ];
+
+        // عناصر DOM
+        const introScreen = document.getElementById('introScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
+        const startBtn = document.getElementById('startBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const progressElement = document.getElementById('progress');
+        const timerElement = document.getElementById('timer');
+        const scoreElement = document.getElementById('score');
+        const resultsListElement = document.getElementById('resultsList');
+
+        // متغيرات التطبيق
+        let currentQuestion = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let timeLeft = 60 * 60; // 60 دقيقة بالثواني
+        let timerInterval;
+        let quizCompleted = false;
+        let answeredQuestions = new Set(); // لتتبع الأسئلة التي تمت الإجابة عليها
+
+        // بدء الاختبار
+        startBtn.addEventListener('click', startQuiz);
+
+        // السؤال السابق
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        });
+
+        // السؤال التالي
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                finishQuiz();
+            }
+        });
+
+        // إعادة الاختبار
+        restartBtn.addEventListener('click', () => {
+            currentQuestion = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            timeLeft = 60 * 60;
+            quizCompleted = false;
+            answeredQuestions.clear();
+            
+            resultsScreen.style.display = 'none';
+            introScreen.style.display = 'block';
+            
+            clearInterval(timerInterval);
+            timerElement.textContent = 'الوقت المتبقي: 60:00';
+        });
+
+        // بدء الاختبار
+        function startQuiz() {
+            introScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            
+            startTimer();
+            showQuestion();
+        }
+
+        // عرض السؤال الحالي
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = `س ${currentQuestion + 1}: ${question.question}`;
+            
+            // تحديث أزرار التنقل
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.textContent = currentQuestion === questions.length - 1 ? 'إنهاء الاختبار' : 'التالي';
+            
+            // عرض الخيارات
+            optionsElement.innerHTML = '';
+            const isAnswered = answeredQuestions.has(currentQuestion);
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                if (userAnswers[currentQuestion] === index) {
+                    optionElement.classList.add('selected');
+                    
+                    // إضافة التأثيرات البصرية بناءً على صحة الإجابة
+                    const isCorrect = index === question.correct;
+                    if (isCorrect) {
+                        optionElement.classList.add('correct');
+                    } else {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+                
+                if (isAnswered) {
+                    optionElement.classList.add('disabled');
+                } else {
+                    optionElement.addEventListener('click', () => selectOption(index));
+                }
+                
+                optionElement.textContent = option;
+                optionsElement.appendChild(optionElement);
+            });
+            
+            // إظهار أو إخفاء التغذية الراجعة
+            if (isAnswered) {
+                const isCorrect = userAnswers[currentQuestion] === question.correct;
+                feedbackElement.textContent = isCorrect ? 'إجابة صحيحة! أحسنت!' : 'إجابة خاطئة!';
+                feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            } else {
+                feedbackElement.className = 'feedback';
+                feedbackElement.textContent = '';
+            }
+            
+            // تحديث شريط التقدم
+            progressElement.textContent = `سؤال ${currentQuestion + 1} من ${questions.length}`;
+        }
+
+        // اختيار خيار
+        function selectOption(optionIndex) {
+            // إذا كان الاختبار مكتملاً، لا تسمح بتغيير الإجابات
+            if (quizCompleted) return;
+            
+            // إذا تمت الإجابة على السؤال مسبقاً، لا تسمح بتغييرها
+            if (answeredQuestions.has(currentQuestion)) return;
+            
+            // حفظ الإجابة
+            userAnswers[currentQuestion] = optionIndex;
+            answeredQuestions.add(currentQuestion);
+            
+            // تحديث مظهر الخيارات
+            const options = optionsElement.querySelectorAll('.option');
+            const question = questions[currentQuestion];
+            const isCorrect = optionIndex === question.correct;
+            
+            options.forEach((option, index) => {
+                // تعطيل جميع الخيارات بعد الإجابة
+                option.classList.add('disabled');
+                
+                // إزالة أي أحداث نقر
+                option.replaceWith(option.cloneNode(true));
+                
+                // إضافة التأثيرات البصرية
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === optionIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // عرض التغذية الراجعة
+            feedbackElement.textContent = isCorrect ? 'إجابة صحيحة! أحسنت!' : 'إجابة خاطئة!';
+            feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+        }
+
+        // إنهاء الاختبار وعرض النتائج
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            quizCompleted = true;
+            
+            quizScreen.style.display = 'none';
+            resultsScreen.style.display = 'block';
+            
+            // حساب النتيجة
+            let correctCount = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    correctCount++;
+                }
+            });
+            
+            const scorePercentage = Math.round((correctCount / questions.length) * 100);
+            scoreElement.textContent = `نتيجتك: ${correctCount} من ${questions.length} (${scorePercentage}%)`;
+            
+            // عرض النتائج التفصيلية
+            resultsListElement.innerHTML = '';
+            userAnswers.forEach((answer, index) => {
+                const question = questions[index];
+                const isCorrect = answer === question.correct;
+                
+                const resultItem = document.createElement('div');
+                resultItem.className = `results-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `س ${index + 1}: ${question.question}`;
+                
+                const userAnswerDiv = document.createElement('div');
+                userAnswerDiv.className = 'user-answer';
+                userAnswerDiv.textContent = `إجابتك: ${answer !== null ? question.options[answer] : 'لم تجب'}`;
+                
+                const correctAnswerDiv = document.createElement('div');
+                correctAnswerDiv.className = 'correct-answer';
+                correctAnswerDiv.textContent = `الإجابة الصحيحة: ${question.options[question.correct]}`;
+                
+                resultItem.appendChild(questionNumber);
+                resultItem.appendChild(userAnswerDiv);
+                resultItem.appendChild(correctAnswerDiv);
+                
+                resultsListElement.appendChild(resultItem);
+            });
+        }
+
+        // بدء المؤقت
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                
+                timerElement.textContent = `الوقت المتبقي: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishQuiz();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
